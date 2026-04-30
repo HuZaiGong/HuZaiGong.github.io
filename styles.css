@@ -1,0 +1,483 @@
+/**
+ * 毛玻璃苹果风个人介绍页 - 样式表
+ * 
+ * 设计理念：
+ * 1. 采用 macOS Big Sur 及以后版本的毛玻璃（Glassmorphism）设计语言
+ * 2. 使用 backdrop-filter 实现背景模糊效果
+ * 3. 柔和的渐变色彩和阴影营造深度感
+ * 4. 流畅的动画过渡提升用户体验
+ * 5. 响应式设计适配各种设备
+ */
+
+/* ============================================
+   CSS 变量定义 - 便于主题定制和维护
+   ============================================ */
+:root {
+    /* 主色调 - 苹果风格的蓝色渐变 */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* 背景渐变色 - 多色柔和渐变 */
+    --bg-gradient-1: #667eea;
+    --bg-gradient-2: #764ba2;
+    --bg-gradient-3: #f093fb;
+    --bg-gradient-4: #4facfe;
+    
+    /* 毛玻璃效果核心参数 */
+    --glass-bg: rgba(255, 255, 255, 0.25);        /* 半透明白色背景 */
+    --glass-border: rgba(255, 255, 255, 0.3);      /* 边框颜色 */
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 柔和阴影 */
+    --backdrop-blur: blur(12px);                    /* 背景模糊强度 */
+    
+    /* 文字颜色 */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-tertiary: rgba(255, 255, 255, 0.6);
+    
+    /* 间距系统 - 基于 8px 网格 */
+    --spacing-xs: 0.5rem;   /* 8px */
+    --spacing-sm: 1rem;     /* 16px */
+    --spacing-md: 1.5rem;   /* 24px */
+    --spacing-lg: 2rem;     /* 32px */
+    --spacing-xl: 3rem;     /* 48px */
+    
+    /* 圆角设置 - 苹果风格的大圆角 */
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-xl: 40px;
+    
+    /* 动画曲线 - 平滑缓动 */
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   基础重置与全局样式
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* 基础字体大小 */
+    scroll-behavior: smooth; /* 平滑滚动 */
+}
+
+body {
+    /* 字体栈 - 优先使用苹果系统字体 */
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 
+                 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    
+    /* 背景渐变 - 多色流动效果 */
+    background: linear-gradient(-45deg, 
+                var(--bg-gradient-1), 
+                var(--bg-gradient-2), 
+                var(--bg-gradient-3), 
+                var(--bg-gradient-4));
+    background-size: 400% 400%; /* 放大背景以便动画 */
+    animation: gradientShift 15s ease infinite; /* 背景渐变动画 */
+    
+    min-height: 100vh; /* 占满整个视口高度 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-lg);
+    overflow-x: hidden; /* 防止水平滚动 */
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ============================================
+   背景装饰形状 - 增强毛玻璃效果的层次感
+   ============================================ */
+.background-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* 置于底层 */
+    overflow: hidden;
+    pointer-events: none; /* 不响应鼠标事件 */
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px); /* 强烈模糊创造光晕效果 */
+    opacity: 0.6;
+    animation: float 20s infinite ease-in-out;
+}
+
+/* 四个不同位置和大小的装饰圆形 */
+.shape-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--bg-gradient-1);
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--bg-gradient-2);
+    bottom: -50px;
+    right: -50px;
+    animation-delay: -5s;
+}
+
+.shape-3 {
+    width: 250px;
+    height: 250px;
+    background: var(--bg-gradient-3);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -10s;
+}
+
+.shape-4 {
+    width: 350px;
+    height: 350px;
+    background: var(--bg-gradient-4);
+    bottom: 20%;
+    left: 10%;
+    animation-delay: -15s;
+}
+
+/* ============================================
+   主卡片容器 - 毛玻璃效果核心实现
+   ============================================ */
+.glass-card {
+    /* 毛玻璃效果三要素 */
+    background: var(--glass-bg);              /* 半透明背景 */
+    backdrop-filter: var(--backdrop-blur);    /* 背景模糊 */
+    -webkit-backdrop-filter: var(--backdrop-blur); /* Safari 支持 */
+    
+    /* 边框和阴影 */
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    
+    /* 尺寸和布局 */
+    max-width: 480px;
+    width: 100%;
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    
+    /* 动画效果 */
+    animation: cardEntrance 0.8s var(--transition-smooth) forwards;
+    transform: translateY(30px);
+    opacity: 0;
+}
+
+/* ============================================
+   头部区域 - 头像和信息展示
+   ============================================ */
+.profile-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.avatar-container {
+    /* 头像外框 - 双层边框效果 */
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: inline-block;
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s var(--transition-smooth);
+}
+
+/* 头像悬停效果 - 轻微放大 */
+.avatar:hover {
+    transform: scale(1.05);
+}
+
+.info-section .name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: -0.5px; /* 紧凑字间距 */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-section .title {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+}
+
+.info-section .location {
+    font-size: 0.9rem;
+    color: var(--text-tertiary);
+}
+
+/* ============================================
+   内容区块通用样式
+   ============================================ */
+.about-section,
+.skills-section,
+.contact-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-block;
+}
+
+.about-text {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    text-align: justify;
+}
+
+/* ============================================
+   技能标签 - 胶囊状设计
+   ============================================ */
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+}
+
+.skill-tag {
+    /* 标签样式 - 半透明胶囊 */
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    
+    /* 过渡动画 */
+    transition: all 0.3s var(--transition-smooth);
+    cursor: default;
+}
+
+/* 技能标签悬停效果 - 高亮显示 */
+.skill-tag:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   社交链接 - 图标按钮
+   ============================================ */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+.social-link {
+    /* 图标容器 */
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* 半透明圆形背景 */
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    
+    /* 图标样式 */
+    color: var(--text-primary);
+    transition: all 0.3s var(--transition-smooth);
+}
+
+.social-link svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* 社交图标悬停效果 - 填充白色 */
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   行动号召按钮 - 主要和次要按钮
+   ============================================ */
+.cta-footer {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+}
+
+.btn-primary,
+.btn-secondary {
+    /* 按钮基础样式 */
+    padding: 0.875rem 2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.3s var(--transition-smooth);
+    cursor: pointer;
+    
+    /* 居中文字 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 主要按钮 - 实心渐变 */
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+/* 次要按钮 - 毛玻璃风格 */
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   动画关键帧定义
+   ============================================ */
+
+/* 背景渐变流动动画 */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* 装饰形状漂浮动画 */
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate(20px, 30px) rotate(5deg);
+    }
+    50% {
+        transform: translate(-15px, -20px) rotate(-5deg);
+    }
+    75% {
+        transform: translate(10px, -10px) rotate(3deg);
+    }
+}
+
+/* 卡片入场动画 - 从下方淡入 */
+@keyframes cardEntrance {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   响应式设计 - 移动端适配
+   ============================================ */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px; /* 移动端缩小基础字体 */
+    }
+    
+    body {
+        padding: var(--spacing-sm);
+    }
+    
+    .glass-card {
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+    }
+    
+    .info-section .name {
+        font-size: 1.75rem;
+    }
+    
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .cta-footer {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 480px) {
+    .skills-container {
+        justify-content: center;
+    }
+    
+    .social-links {
+        gap: var(--spacing-sm);
+    }
+    
+    .social-link {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+/* ============================================
+   可访问性优化 - 减少动画偏好
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
